@@ -1,0 +1,25 @@
+type ActorId = struct {
+  [u8, 32],
+};
+
+constructor {
+  New : ();
+};
+
+service Dns {
+  AddAdmin : (user: ActorId) -> null;
+  AddNewProgram : (name: str, program_id: ActorId) -> null;
+  ChangeProgramId : (name: str, program_id: ActorId) -> null;
+  DeleteAdmin : (user: ActorId) -> null;
+  query ActiveContracts : () -> vec struct { str, ActorId };
+  query Admins : () -> vec ActorId;
+  query History : () -> vec struct { str, vec struct { str, ActorId } };
+
+  events {
+    AdminAdded: struct { new_admin: ActorId };
+    AdminDeleted: struct { deleted_admin: ActorId };
+    NewProgramAdded: struct { name: str, program_id: ActorId };
+    ProgramIdChanged: struct { name: str, program_id: ActorId, date: str };
+  }
+};
+

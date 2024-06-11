@@ -1,0 +1,29 @@
+type DNS @entity {
+  id: ID!
+  address: String!
+  admins: [String!]!
+  programs: [Program!]! @derivedFrom(field: "dns")
+  events: [Event!]! @derivedFrom(field: "dns")
+}
+
+type Program @entity {
+  "Program address"
+  id: ID!
+  name: String!
+  address: String!
+  dns: DNS!
+  createdBy: String!
+  history: String!
+  createdAt: DateTime! @index
+  updatedAt: DateTime! @index
+}
+
+type Event @entity {
+  id: ID!
+  type: String!
+  raw: String!
+  dns: DNS!
+  blockNumber: Int!
+  txHash: String!
+  timestamp: DateTime!
+}
