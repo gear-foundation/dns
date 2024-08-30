@@ -1,6 +1,6 @@
 use gstd::collections::HashMap;
 use gstd::{exec, msg, prelude::*, ActorId, Decode, Encode, String, TypeInfo};
-use sails::gstd::gservice;
+use sails_rs::gstd::service;
 
 pub type Time = String;
 static mut DATA: Option<DnsData> = None;
@@ -68,7 +68,7 @@ impl Service {
     }
 }
 
-#[gservice(events = Event)]
+#[service(events = Event)]
 impl Service {
     pub fn new() -> Self {
         Self

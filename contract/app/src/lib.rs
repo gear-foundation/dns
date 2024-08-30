@@ -1,12 +1,12 @@
 #![no_std]
 
-use sails::gstd::gprogram;
+use sails_rs::gstd::program;
 
 pub mod service;
 
 pub struct Program(());
 
-#[gprogram]
+#[program]
 impl Program {
     pub fn new() -> Self {
         service::Service::seed();

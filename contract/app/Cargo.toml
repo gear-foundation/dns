@@ -7,7 +7,7 @@ license.workspace = true
 [dependencies]
 gstd.workspace = true
 primitive-types.workspace = true
-sails.workspace = true
+sails-rs.workspace = true
 parity-scale-codec.workspace = true
 scale-info.workspace = true
 chrono-light = { version = "0.1.5", default-features = false }
