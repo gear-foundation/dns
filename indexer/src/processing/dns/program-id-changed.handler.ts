@@ -15,14 +15,20 @@ export class ProgramIdChangedHandler implements IDNSEventHandler {
       console.warn(`[ProgramIdChangedHandler] program not exists`);
       return;
     }
-    const newHistory = JSON.parse(program.history);
-    newHistory.push(program);
+    let history = '';
+    try {
+      const newHistory = JSON.parse(program.history);
+      newHistory.push(program);
+      history = JSON.stringify(newHistory)
+    } catch (e) {
+      history = JSON.stringify([program]);
+    }
     await storage.setProgram(
       new Program({
         ...program,
         admins: [...new Set([...program.admins, ...event.admins])],
         address: event.program,
-        history: JSON.stringify(newHistory),
+        history: history,
         updatedAt: eventInfo.timestamp,
       }),
     );
