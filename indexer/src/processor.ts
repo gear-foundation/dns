@@ -28,8 +28,7 @@ export const processor = new SubstrateBatchProcessor()
       timestamp: true,
     },
   })
-  .setBlockRange({ from: config.minBlockNum })
-  .setBatchSize(config.batchSize);
+  .setBlockRange({ from: config.minBlockNum });
 
 export type Fields = SubstrateBatchProcessorFields<typeof processor>;
 export type Block = BlockHeader<Fields>;

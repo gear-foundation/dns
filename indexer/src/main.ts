@@ -1,6 +1,6 @@
-import { TypeormDatabase } from "@subsquid/typeorm-store";
+import { TypeormDatabase, Store } from "@subsquid/typeorm-store";
 
-import { processor } from "./processor";
+import { processor, ProcessorContext } from "./processor";
 import { EventsProcessing } from "./processing/events.processing";
 import { EventInfo } from "./processing/event-info.type";
 import { Block } from "@subsquid/substrate-processor";
@@ -21,7 +21,7 @@ function getBlockDate(
   return new Date(block.header.timestamp ?? new Date().getTime());
 }
 
-processor.run(new TypeormDatabase(), async (ctx) => {
+processor.run(new TypeormDatabase(), async (ctx: ProcessorContext<Store>) => {
   const localStorage = await getLocalStorage(ctx.store);
   const entitiesService = new EntitiesService(
     localStorage,
