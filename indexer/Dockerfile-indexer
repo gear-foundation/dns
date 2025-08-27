@@ -18,6 +18,4 @@ RUN npm run build
 
 ADD commands.json .
 ENV PROCESSOR_PROMETHEUS_PORT 3000
-# Set Node.js memory limits and GC optimization
-ENV NODE_OPTIONS="--max-old-space-size=512 --max-semi-space-size=64 --expose-gc"
 CMD ["sqd", "process"]
