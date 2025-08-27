@@ -19,6 +19,10 @@ export class ProgramIdChangedHandler implements IDNSEventHandler {
     try {
       const newHistory = JSON.parse(program.history);
       newHistory.push(program);
+      // Ограничиваем историю до последних 10 записей для предотвращения утечки памяти
+      if (newHistory.length > 10) {
+        newHistory.splice(0, newHistory.length - 10);
+      }
       history = JSON.stringify(newHistory)
     } catch (e) {
       history = JSON.stringify([program]);

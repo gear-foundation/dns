@@ -12,4 +12,5 @@ export const checkEnv = (envName: string, defaultValue?: string) => {
 export const config = {
   rateLimit: Number.parseInt(checkEnv("RATE_LIMIT", "100")),
   minBlockNum: Number.parseInt(checkEnv("MIN_BLOCK_NUMBER", "0")),
+  batchSize: Number.parseInt(checkEnv("BATCH_SIZE", "50")), // Ограничиваем размер батча для контроля памяти
 };

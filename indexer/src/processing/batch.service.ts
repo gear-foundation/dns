@@ -42,7 +42,13 @@ export class BatchService {
   private safelyPush(entity: string, value: any) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    this[entity] = [...this[entity].filter((e) => e.id !== value.id), value];
+    const array = this[entity] as any[];
+    const existingIndex = array.findIndex((e) => e.id === value.id);
+    if (existingIndex >= 0) {
+      array[existingIndex] = value; // Заменяем существующий элемент
+    } else {
+      array.push(value); // Добавляем новый элемент
+    }
   }
 
   deleteProgram(program: Program) {
