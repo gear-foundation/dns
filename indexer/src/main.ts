@@ -1,6 +1,6 @@
-import { TypeormDatabase } from "@subsquid/typeorm-store";
+import { TypeormDatabase, Store } from "@subsquid/typeorm-store";
 
-import { processor } from "./processor";
+import { processor, ProcessorContext } from "./processor";
 import { EventsProcessing } from "./processing/events.processing";
 import { EventInfo } from "./processing/event-info.type";
 import { Block } from "@subsquid/substrate-processor";
@@ -21,7 +21,7 @@ function getBlockDate(
   return new Date(block.header.timestamp ?? new Date().getTime());
 }
 
-processor.run(new TypeormDatabase(), async (ctx) => {
+processor.run(new TypeormDatabase(), async (ctx: ProcessorContext<Store>) => {
   const localStorage = await getLocalStorage(ctx.store);
   const entitiesService = new EntitiesService(
     localStorage,
@@ -35,8 +35,10 @@ processor.run(new TypeormDatabase(), async (ctx) => {
   );
   const firstBlockDate = getBlockDate(ctx.blocks[0]);
   console.log(
-    `[main] start processing ${ctx.blocks.length} blocks at ${firstBlockDate}.`,
+    `[main] start processing ${ctx.blocks.length} blocks at ${firstBlockDate}. Memory usage: ${Math.round(process.memoryUsage().heapUsed / 1024 / 1024)}MB`,
   );
+  
+  let processedEvents = 0;
   for (const block of ctx.blocks) {
     const { events } = block;
     const timestamp = getBlockDate(block);
@@ -60,8 +62,21 @@ processor.run(new TypeormDatabase(), async (ctx) => {
       };
       if (localStorage.getDNS().address === source) {
         await processing.handleDnsEvent(payload, eventInfo);
+        processedEvents++;
+        
+        // Периодически принудительно запускаем сборщик мусора
+        if (processedEvents % 100 === 0) {
+          if (global.gc) {
+            global.gc();
+          }
+        }
       }
     }
   }
   await processing.saveAll();
+  
+  const memUsage = process.memoryUsage();
+  console.log(
+    `[main] finished processing ${ctx.blocks.length} blocks. Memory usage: ${Math.round(memUsage.heapUsed / 1024 / 1024)}MB / ${Math.round(memUsage.heapTotal / 1024 / 1024)}MB`,
+  );
 });

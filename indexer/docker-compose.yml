@@ -13,3 +13,27 @@ services:
 #    volumes:
 #      - ./data/db:/var/lib/postgresql/data
 
+  indexer:
+    build:
+      context: .
+      dockerfile: Dockerfile-indexer
+    environment:
+      - RPC_ENDPOINT=${RPC_ENDPOINT}
+      - RATE_LIMIT=50
+      - BATCH_SIZE=25
+      - MIN_BLOCK_NUMBER=0
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=squid
+      - DB_USER=postgres
+      - DB_PASS=postgres
+    depends_on:
+      - db
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+        reservations:
+          memory: 256M
+    restart: unless-stopped
+
