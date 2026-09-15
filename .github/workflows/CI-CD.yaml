@@ -6,24 +6,20 @@ on:
     paths-ignore:
       - '.github/**'
       - '**.md'
-    tags: ["v*"]
   workflow_dispatch:
     inputs:
       env:
         type: choice
         description: Target environment
         required: false
-        options:
-          - dev
-          - stg
-          - prod
+        options: [prod]
       deploy_indexer:
         type: boolean
-        description: Deploy indexer
+        description: Build indexer
         default: true
       deploy_explorer:
         type: boolean
-        description: Deploy explorer
+        description: Build explorer
         default: true
 
 concurrency:
@@ -37,34 +33,19 @@ permissions:
   id-token: write
 
 jobs:
-  deploy_indexer:
+  deploy:
     uses: gear-ops/actions/.github/workflows/build-deploy.yaml@main
     with:
-      argocd_server: ${{ vars.ARGOCD_SERVER }}
-      vault_server: ${{ vars.VAULT_SERVER }}
       app: dns
-      component: indexer
       env: ${{ inputs.env }}
-      dockerfile: indexer/Dockerfile-indexer
-      context: indexer
-      paths_filter: |
-        indexer/**
+      components: |
+        - name: indexer
+          docker_context: indexer
+          docker_file: Dockerfile-indexer
+          paths: indexer/**
+        - name: explorer
+          docker_context: api
+          paths: api/**
     secrets:
-      WORKLOADS_REPO_TOKEN: ${{ secrets.WORKLOADS_REPO_TOKEN }}
-      ARGOCD_TOKEN:         ${{ secrets.ARGOCD_TOKEN }}
-
-  deploy_explorer:
-    uses: gear-ops/actions/.github/workflows/build-deploy.yaml@main
-    with:
-      argocd_server: ${{ vars.ARGOCD_SERVER }}
-      vault_server: ${{ vars.VAULT_SERVER }}
-      app: dns
-      component: explorer
-      env: ${{ inputs.env }}
-      dockerfile: api/Dockerfile
-      context: api
-      paths_filter: |
-        api/**
-    secrets:
-      WORKLOADS_REPO_TOKEN: ${{ secrets.WORKLOADS_REPO_TOKEN }}
-      ARGOCD_TOKEN:         ${{ secrets.ARGOCD_TOKEN }}
+      CHARTS_REPO_TOKEN: ${{ secrets.CHARTS_REPO_TOKEN }}
+      ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_AUTH_TOKEN }}
