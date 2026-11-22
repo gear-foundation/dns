@@ -19,7 +19,7 @@ It accumulates [kusama](https://kusama.network) account transfers and serves the
 
 ## Prerequisites
 
-* node 16.x
+* node 24.x
 * docker
 * npm -- note that `yarn` package manager is not supported
 
