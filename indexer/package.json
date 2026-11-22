@@ -2,7 +2,7 @@
   "name": "dns-indexer",
   "private": true,
   "engines": {
-    "node": ">=16"
+    "node": ">=24"
   },
   "scripts": {
     "build": "rm -rf lib && tsc",
@@ -12,7 +12,7 @@
     "serve": "squid-graphql-server serve",
     "serve:prod": "squid-graphql-server --subscriptions --dumb-cache in-memory --dumb-cache-ttl 1000 --dumb-cache-size 100 --dumb-cache-max-age 1000",
     "format": "prettier --write \"src/**/*.ts\"",
-    "start": "npm run migration:apply && node lib/main.js"
+    "start": "node lib/start.js"
   },
   "dependencies": {
     "@gear-js/api": "^0.38.0",

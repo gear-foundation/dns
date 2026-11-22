@@ -1,21 +1,31 @@
-FROM node:18-alpine AS node
-RUN apk add g++ make python3
-RUN npm i -g @subsquid/cli@latest
-RUN npm i -g typescript@5.2.2
-WORKDIR /squid
-ADD package.json .
-ADD package-lock.json .
-RUN npm i @types/node
-# remove if needed
-ADD assets assets
-# remove if needed
-ADD db db
-# remove if needed
-ADD schema.graphql .
-ADD tsconfig.json .
-ADD src src
-RUN npm run build
+FROM node:24.22.3-trixie-slim@sha256:af02d57b57719b9657a45199a79264a9437940cd55b3c7b3fc99615654f124a0 AS build
 
-ADD commands.json .
-ENV PROCESSOR_PROMETHEUS_PORT 3000
-CMD ["sqd", "process"]
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends g++ make python3 \
+ && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /squid
+
+COPY package.json package-lock.json .npmrc ./
+RUN npm ci
+
+COPY tsconfig.json ./
+COPY src ./src
+RUN npm run build \
+ && npm prune --omit=dev
+
+
+FROM gcr.io/distroless/nodejs24-debian13:nonroot@sha256:6abfcb367ebc291572c774c1592a986be2ab26a2486f73093401327495a5962a AS processor
+
+ENV PROCESSOR_PROMETHEUS_PORT=3000
+
+WORKDIR /squid
+
+COPY package.json ./
+COPY --from=build /squid/node_modules ./node_modules
+COPY --from=build /squid/lib ./lib
+COPY assets ./assets
+COPY db ./db
+
+EXPOSE 3000
+CMD ["lib/start.js"]
